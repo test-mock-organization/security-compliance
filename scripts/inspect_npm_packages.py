@@ -50,18 +50,26 @@ def extract_dependencies(package_json):
     return all_deps
 
 # by looking at a package and its version string, we compare it to the dict of known vulnerable packages
-# allowed_range contains all the different versions of that package, that we accept 
+# allowed_range contains all the different versions of that package that we accept 
 # (i.e. if the vulnerable version is contained in that range, we are in trouble) 
 def is_version_vulnerable(pkg, allowed_range):
     if pkg not in VULNERABLE_PACKAGES:
         # package clean
         return False
+    
     try:
         # here we use the semantic_version library to see if that package is contained in the range
-        vulnerable_version = Version(VULNERABLE_PACKAGES[pkg])
         spec = SimpleSpec(allowed_range)
-        return vulnerable_version in spec
-    except Exception:
+        for vuln_ver_str in VULNERABLE_PACKAGES[pkg]:
+            # convert string to Version object
+            vuln_version = Version(vuln_ver_str)
+            # if the vulnerable version is allowed by the range, there is a problem
+            if vuln_version in spec:
+                return True
+        return False  # none of the vulnerable versions are included
+    
+    except Exception as e:
+        print(f"Error checking version for {pkg}: {e}")
         return False
     
 # we want a way to check whether we already raised the issue in a given repo
@@ -85,6 +93,8 @@ def create_issue(repo, vulnerable_deps):
     except Exception as e:
         print(f"Failed to create issue in {repo.full_name}: {e}")
 
+print(VULNERABLE_PACKAGES)
+
 # main loop
 for repo in repos:
     print(f"Checking {repo.full_name}...")
@@ -95,6 +105,7 @@ for repo in repos:
 
     # all dependencies in the repo
     deps = extract_dependencies(package_json)
+    print(deps)
 
     # this will contain all the vulnerable dependencies used in that repo
     vulnerable_deps = {}
@@ -102,6 +113,8 @@ for repo in repos:
     for pkg, version in deps.items():
         if is_version_vulnerable(pkg, version):
             vulnerable_deps[pkg] = version
+
+    print(vulnerable_deps)
 
     # in case there are vulnerable dependencies, then we raise the alarm!
     if vulnerable_deps:
