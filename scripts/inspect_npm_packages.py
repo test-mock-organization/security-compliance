@@ -9,11 +9,10 @@ from semantic_version import SimpleSpec, Version
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 ORG_NAME = "test-mock-organization"
 
-# define vulnerable packages with vulnerable versions
-VULNERABLE_PACKAGES = {
-    "ngx-perfect-scrollbar": "20.0.20",
-    "config-eslint": ">2.0.4"
-}
+# open file where vulnerable packages are defined with vulnerable versions
+vulnerable_packages_file = os.path.join("data", "vulnerable_packages.json")
+with open(vulnerable_packages_file, "r") as f:
+    VULNERABLE_PACKAGES = json.load(f)
 
 # define the issue title + content, this is what the users will see
 ISSUE_TITLE = "Vulnerable NPM dependencies detected"
