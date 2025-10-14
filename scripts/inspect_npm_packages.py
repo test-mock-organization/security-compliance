@@ -105,7 +105,6 @@ for repo in repos:
 
     # all dependencies in the repo
     deps = extract_dependencies(package_json)
-    print(deps)
 
     # this will contain all the vulnerable dependencies used in that repo
     vulnerable_deps = {}
@@ -113,8 +112,6 @@ for repo in repos:
     for pkg, version in deps.items():
         if is_version_vulnerable(pkg, version):
             vulnerable_deps[pkg] = version
-
-    print(vulnerable_deps)
 
     # in case there are vulnerable dependencies, then we raise the alarm!
     if vulnerable_deps:
