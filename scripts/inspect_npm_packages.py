@@ -93,8 +93,6 @@ def create_issue(repo, vulnerable_deps):
     except Exception as e:
         print(f"Failed to create issue in {repo.full_name}: {e}")
 
-print(VULNERABLE_PACKAGES)
-
 # main loop
 for repo in repos:
     print(f"Checking {repo.full_name}...")
