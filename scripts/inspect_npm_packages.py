@@ -51,16 +51,17 @@ def extract_dependencies(package_json):
     return all_deps
 
 # by looking at a package and its version string, we compare it to the dict of known vulnerable packages
-def is_version_vulnerable(pkg, version_str):
+# allowed_range contains all the different versions of that package, that we accept 
+# (i.e. if the vulnerable version is contained in that range, we are in trouble) 
+def is_version_vulnerable(pkg, allowed_range):
     if pkg not in VULNERABLE_PACKAGES:
         # package clean
         return False
     try:
         # here we use the semantic_version library to see if that package is contained in the range
-        spec = SimpleSpec(VULNERABLE_PACKAGES[pkg])
-        clean_version = version_str.lstrip("^~<>= ")
-        version = Version.coerce(clean_version)
-        return version in spec
+        vulnerable_version = Version(VULNERABLE_PACKAGES[pkg])
+        spec = SimpleSpec(allowed_range)
+        return vulnerable_version in spec
     except Exception:
         return False
     
