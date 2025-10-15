@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from datetime import datetime, timezone
-from github import Github
+from github import Github, Auth
 # since the version of packages is in general given as a range (using ^, ~, >, <, =) we need semantic_version to treat that 
 from semantic_version import SimpleSpec, Version
 
@@ -28,7 +28,8 @@ Please review and update these dependencies if appropriate.
 MAXIMUM_DAYS = 0
 
 # GH API client
-g = Github(GITHUB_TOKEN)
+auth = Auth.Token(GITHUB_TOKEN)
+g = Github(auth=auth)
 org = g.get_organization(ORG_NAME)
 
 # we maybe do not want to inspect all repositories so we can exclude some by name
