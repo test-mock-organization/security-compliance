@@ -1,8 +1,8 @@
-# Security Notice: vulnerability in common npm Packages
+# Security Notice: vulnerability in common packages
 
 ## Summary
 
-We’ve been informed about a vulnerability affecting several npm packages. These packages may be present in some of our repositories!
+We’ve been informed about a vulnerability affecting several packages. These packages may be present in some of our repositories!
 
 ## What we're doing
 
@@ -19,7 +19,6 @@ We’ve been informed about a vulnerability affecting several npm packages. Thes
 
 This is a great reminder to:
 - Regularly checck your dependencies
-- Use `npm audit` to spot vulnerabilities
 - Review PRs for dependency changes carefully
 
 Thank you for your attention and support in keeping our codebase secure.  

@@ -10,15 +10,17 @@ import re
 import toml
 
 # helper functions to parse different file formats
+
+# JavaScript: package.json
 def parse_package_json(content):
     data = json.loads(content)
     deps = {}
-    for section in ['dependencies', 'devDependencies']:
+    for section in ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']:
         for pkg, ver in data.get(section, {}).items():
             deps[pkg] = ver
     return deps
 
-
+# Python: requirements.txt
 def parse_requirements_txt(content):
     deps = {}
     for line in content.splitlines():
@@ -30,7 +32,7 @@ def parse_requirements_txt(content):
                 deps[pkg] = ver.strip() if ver else '*'
     return deps
 
-
+# Python: Pipfile
 def parse_pipfile(content):
     deps = {}
     pipfile = toml.loads(content)
@@ -42,7 +44,7 @@ def parse_pipfile(content):
                 deps[pkg] = ver
     return deps
 
-
+# Python: pyproject.toml
 def parse_pyproject_toml(content):
     deps = {}
     data = toml.loads(content)
@@ -57,6 +59,7 @@ def parse_pyproject_toml(content):
                 deps[pkg] = ver
     return deps
 
+# Python: setup.py
 def parse_setup_py(content):
     deps = {}
     matches = re.findall(r'install_requires\s*=\s*\[([^\]]+)\]', content, re.DOTALL)
