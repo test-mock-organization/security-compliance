@@ -67,7 +67,7 @@ def is_version_vulnerable(pkg, allowed_range):
 def issue_already_exists(repo):
     try:
         for issue in repo.get_issues(state='open'):
-            # we check by looking at the title (what about the body?)
+            # we check if content is similar
             if ISSUE_TITLE.lower() in issue.title.lower():
                 return True
     except:
@@ -98,7 +98,7 @@ for repo in repos:
         if is_version_vulnerable(pkg, version):
             vulnerable_deps[pkg] = version
 
-    # in case there are vulnerable dependencies, then we raise the alarm!
+    # in case there are vulnerable dependencies, then we raise the alarm by creating an issue!
     if vulnerable_deps:
         if not issue_already_exists(repo):
             create_issue(repo, vulnerable_deps)

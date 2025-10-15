@@ -21,7 +21,7 @@ security-clearance/
 where:
 - `vulnerable_packages.json`: json file containing all vulnerable packages and versions
 - `inspect_packages.py`: the python script run by the Github Action, taking care of inspecting all repos in the organisation and looking for dependencies that are 
-- `dependencies.py`: where we define what kind of dependencies we are looking for, basically a general function that is used in `inspect_packages.py` and can be adapted to any language ecosystem
+- `dependencies.py`: where we define what kind of dependencies we are looking for, basically a general function that is used in `inspect_packages.py` and can be adapted to any language ecosystem by adding the proper parsing helper functions (and not forget to include the used libraries in the `automate_script.yml` 'Install Python dependencies' step)
 - `scrape_html_table.py`: a script to automatically export the table in the aikido.dev website into a json file (needs to be run from the parent directory `security-clearance/`)
 - `automate_script.yml`: the workflow file used by the Github Action to automatically run the python script 
 - `info.md`: an example of how this situation would be communicated to users in the company, it would be shared (e.g. via mail marked as urgent) as soon as possible  
