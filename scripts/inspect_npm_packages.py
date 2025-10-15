@@ -123,12 +123,12 @@ for repo in repos:
             print(f"Issue already exists in {repo.full_name}!")
 
     # now we want to follow up on issues that are already open since a specific amount of time
-    open_issues = repo.get_issues(state="open", labels=[], since=None)
+    open_issues = repo.get_issues(state="open")
     for issue in open_issues:
         # if it is an issue raised by this script then it has the title ISSUE_TITLE 
         # (we dont want to act on other Issues, possibly opened by users manually)
         if ISSUE_TITLE in issue.title:
-            age_days = (datetime.now() - issue.created_at).days
+            age_days = (datetime.now(timezone.utc) - issue.created_at).days
             if age_days >= MAXIMUM_DAYS:
 
                 # we insert a marker in the comment so that we can easily know that it is not written by a user
