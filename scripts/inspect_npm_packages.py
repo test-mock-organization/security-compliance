@@ -25,7 +25,7 @@ Please review and update these dependencies if appropriate.
 """
 
 # maximum number of days we leave an open Issue before acting on it 
-MAXIMUM_DAYS = 0
+MAXIMUM_DAYS = 1
 
 # GH API client
 auth = Auth.Token(GITHUB_TOKEN)
