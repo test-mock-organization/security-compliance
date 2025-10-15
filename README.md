@@ -5,17 +5,17 @@ This repo contains what is necessary to automatically scan, detect and alert use
 # Structure
 ```
 security-clearance/
+├── .github/
+│   └── workflows/
+│       └── automate_script.yml
 ├── data/
 │   └── vulnerable_packages.json
+├── notes/
+│   └── info.md
 ├── scripts/
 │   └── inspect_packages.py
 │   └── dependencies.py
 │   └── scrape_html_table.py
-├── notes/
-│   └── info.md
-├── .github/
-│   └── workflows/
-│       └── automate_script.yml
 └── README.md
 ```
 where:
