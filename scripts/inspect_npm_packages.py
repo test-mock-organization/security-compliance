@@ -32,7 +32,7 @@ g = Github(GITHUB_TOKEN)
 org = g.get_organization(ORG_NAME)
 
 # we maybe do not want to inspect all repositories so we can exclude some by name
-exclude_names = {"security-clearance"}
+exclude_names = {"security-compliance"}
 repos = [repo for repo in org.get_repos() if repo.name not in exclude_names]
 
 # find the package json file in a repo
@@ -141,7 +141,7 @@ for repo in repos:
                 reminder_comment = f"{marker}\nThis issue has been open for {age_days} days... Please review the dependencies!"
                 
                 # we want to check if we already commented this one to not spam every time the script runs!
-                # get the first generated comment with next(...)
+                # get the first generated comment with next(...), we assume there is only 1 per post anyways
                 comments = issue.get_comments()
                 bot_comment = next((c for c in comments if marker in c.body), None)
 
