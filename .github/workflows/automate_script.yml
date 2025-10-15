@@ -1,4 +1,4 @@
-name: Inspect NPM dependencies across organization
+name: Inspect dependencies across organization
 
 on:
   workflow_dispatch:  # manual trigger
