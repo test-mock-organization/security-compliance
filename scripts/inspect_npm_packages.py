@@ -30,7 +30,10 @@ MAXIMUM_DAYS = 0
 # GH API client
 g = Github(GITHUB_TOKEN)
 org = g.get_organization(ORG_NAME)
-repos = org.get_repos()
+
+# we maybe do not want to inspect all repositories so we can exclude some by name
+exclude_names = {"security-clearance"}
+repos = [repo for repo in org.get_repos() if repo.name not in exclude_names]
 
 # find the package json file in a repo
 def get_package_json(repo):
