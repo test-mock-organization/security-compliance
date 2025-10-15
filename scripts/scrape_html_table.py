@@ -23,8 +23,18 @@ for row in table_body.find_all('tr'):
     cols = row.find_all('td')
     if len(cols) >= 2:
         package = cols[0].get_text(strip=True)
-        version = cols[1].get_text(strip=True)
-        data[package] = [version]  # wrap the version in a list for proper format
+        version_text = cols[1].get_text(strip=True)
+
+        # split version_text by comma and strip whitespace
+        versions = [v.strip() for v in version_text.split(',') if v.strip()]
+
+        # initialize or append unique versions
+        if package not in data:
+            data[package] = versions
+        else:
+            for v in versions:
+                if v not in data[package]:
+                    data[package].append(v)
 
 # we want to store it in /data
 output_file = os.path.join('data', 'vulnerable_packages.json')
@@ -33,4 +43,4 @@ output_file = os.path.join('data', 'vulnerable_packages.json')
 with open(output_file, 'w', encoding='utf-8') as json_file:
     json.dump(data, json_file, indent=4, ensure_ascii=False)
 
-print("Data saved to auto_vulnerable_packages.json")
+print("Data saved to vulnerable_packages.json")
