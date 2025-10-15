@@ -20,7 +20,7 @@ jobs:
       
       # PyGithub is a Python library to access the GitHub REST API
       - name: Install Python dependencies
-        run: pip install PyGithub requests semantic_version
+        run: pip install PyGithub requests semantic_version toml
 
       - name: Run inspection script
         env:
