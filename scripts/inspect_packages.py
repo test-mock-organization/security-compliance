@@ -62,25 +62,28 @@ def is_version_vulnerable(pkg, allowed_range):
     except Exception as e:
         print(f"Error checking version for {pkg}: {e}")
         return False
-    
-# we want a way to check whether we already raised the issue in a given repo
-def issue_already_exists(repo):
-    try:
-        for issue in repo.get_issues(state='open'):
-            # we check if content is similar
-            if ISSUE_TITLE.lower() in issue.title.lower():
-                return True
-    except:
-        pass
-    return False
 
 # function to raise the GH issue in a given repo with its vulnerable dependencies
 def create_issue(repo, vulnerable_deps):
-    # we use the template defined above
-    body = ISSUE_BODY_TEMPLATE.format("\n".join(f"- `{pkg}@{ver}`" for pkg, ver in vulnerable_deps.items()))
+    # find all open issues with the same title
+    existing_issues = []
+    for issue in repo.get_issues(state='open'):
+        if ISSUE_TITLE.lower() in issue.title.lower():
+            existing_issues.append(issue)
+    
+    # format the body for the new vulnerabilities
+    new_body = ISSUE_BODY_TEMPLATE.format("\n".join(f"- `{pkg}@{ver}`" for pkg, ver in vulnerable_deps.items()))
+    
+    # check if any existing issue has the same body
+    for issue in existing_issues:
+        if issue.body.strip() == new_body.strip():  # ignore leading/trailing whitespace
+            print("No new vulnerabilities to report. Issue already exists.")
+            return  # no new issue created, as the body is the same
+
+    # if no matching issue is found, create a new issue with updated list of vulnerable dependencies
     try:
-        repo.create_issue(title=ISSUE_TITLE, body=body)
-        print(f"Created issue in {repo.full_name}")
+        repo.create_issue(title=ISSUE_TITLE, body=new_body)
+        print(f"Created new issue in {repo.full_name}")
     except Exception as e:
         print(f"Failed to create issue in {repo.full_name}: {e}")
 
@@ -100,10 +103,7 @@ for repo in repos:
 
     # in case there are vulnerable dependencies, then we raise the alarm by creating an issue!
     if vulnerable_deps:
-        if not issue_already_exists(repo):
-            create_issue(repo, vulnerable_deps)
-        else:
-            print(f"Issue already exists in {repo.full_name}!")
+        create_issue(repo, vulnerable_deps)
 
     # now we want to follow up on issues that are already open since a specific amount of time
     open_issues = repo.get_issues(state="open")
