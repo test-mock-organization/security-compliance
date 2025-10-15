@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import os 
 
 URL = "https://www.aikido.dev/blog/s1ngularity-nx-attackers-strike-again"
 
@@ -25,8 +26,11 @@ for row in table_body.find_all('tr'):
         version = cols[1].get_text(strip=True)
         data[package] = [version]  # wrap the version in a list for proper format
 
+# we want to store it in /data
+output_file = os.path.join('data', 'vulnerable_packages.json')
+
 # save the result to a JSON file
-with open('auto_vulnerable_packages.json', 'w', encoding='utf-8') as json_file:
+with open(output_file, 'w', encoding='utf-8') as json_file:
     json.dump(data, json_file, indent=4, ensure_ascii=False)
 
 print("Data saved to auto_vulnerable_packages.json")
