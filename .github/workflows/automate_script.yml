@@ -26,4 +26,4 @@ jobs:
         env:
           # use GH Secrets for maximum security
           GITHUB_TOKEN: ${{ secrets.ORG_GH_TOKEN }}
-        run: python scripts/inspect_npm_packages.py
+        run: python scripts/inspect_packages.py
