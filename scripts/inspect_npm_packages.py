@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from datetime import datetime, timezone
 from github import Github
 # since the version of packages is in general given as a range (using ^, ~, >, <, =) we need semantic_version to treat that 
 from semantic_version import SimpleSpec, Version
@@ -22,6 +23,9 @@ ISSUE_BODY_TEMPLATE = """This repository uses one or more npm packages with know
 
 Please review and update these dependencies if appropriate.
 """
+
+# maximum number of days we leave an open Issue before acting on it 
+MAXIMUM_DAYS = 0
 
 # GH API client
 g = Github(GITHUB_TOKEN)
@@ -117,3 +121,37 @@ for repo in repos:
             create_issue(repo, vulnerable_deps)
         else:
             print(f"Issue already exists in {repo.full_name}!")
+
+    # now we want to follow up on issues that are already open since a specific amount of time
+    open_issues = repo.get_issues(state="open", labels=[], since=None)
+    for issue in open_issues:
+        # if it is an issue raised by this script then it has the title ISSUE_TITLE 
+        # (we dont want to act on other Issues, possibly opened by users manually)
+        if ISSUE_TITLE in issue.title:
+            age_days = (datetime.now() - issue.created_at).days
+            if age_days >= MAXIMUM_DAYS:
+
+                # we insert a marker in the comment so that we can easily know that it is not written by a user
+                marker = "<!-- generated reminder comment -->"
+                
+                # comment content
+                reminder_comment = f"{marker}\nThis issue has been open for {age_days} days... Please review the dependencies!"
+                
+                # we want to check if we already commented this one to not spam every time the script runs!
+                # get the first generated comment with next(...)
+                comments = issue.get_comments()
+                bot_comment = next((c for c in comments if marker in c.body), None)
+
+                if bot_comment:
+                    # edit the existing comment
+                    bot_comment.edit(reminder_comment)
+                    print(f"Updated comment on {repo.full_name}#{issue.number}")
+                else:
+                    # create a new comment if none found
+                    issue.create_comment(reminder_comment)
+                    print(f"Posted new comment on {repo.full_name}#{issue.number}")
+                
+                # also add a label if not already present
+                labels = [label.name for label in issue.labels]
+                if "overdue" not in labels:
+                    issue.add_to_labels("overdue")
