@@ -3,8 +3,12 @@ import json
 import requests
 from datetime import datetime, timezone
 from github import Github, Auth
+
 # since the version of packages is in general given as a range (using ^, ~, >, <, =) we need semantic_version to treat that 
 from semantic_version import SimpleSpec, Version
+
+# we can write a general function to scan for dependencies in another file to keep it general and not restrict to a language ecosystem
+import dependencies
 
 # we load the GH token from environment (to avoid hardcoding it here!)
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -16,8 +20,8 @@ with open(vulnerable_packages_file, "r") as f:
     VULNERABLE_PACKAGES = json.load(f)
 
 # define the issue title + content, this is what the users will see
-ISSUE_TITLE = "Vulnerable NPM dependencies detected"
-ISSUE_BODY_TEMPLATE = """This repository uses one or more npm packages with known issues or vulnerabilities:
+ISSUE_TITLE = "Vulnerable dependencies detected"
+ISSUE_BODY_TEMPLATE = """This repository uses one or more packages with known issues or vulnerabilities:
 
 {}
 
@@ -35,27 +39,6 @@ org = g.get_organization(ORG_NAME)
 # we maybe do not want to inspect all repositories so we can exclude some by name
 exclude_names = {"security-compliance"}
 repos = [repo for repo in org.get_repos() if repo.name not in exclude_names]
-
-# find the package json file in a repo
-def get_package_json(repo):
-    try:
-        file = repo.get_contents("package.json")
-        response = requests.get(file.download_url)
-        # we check that the request has succeeded (200 = OK)
-        if response.status_code == 200:
-            return json.loads(response.text)
-    except:
-        pass
-    return None
-
-# given a package in a json format, we extract all dependencies
-def extract_dependencies(package_json):
-    all_deps = {}
-    # those are the fields for the packages needed to run the app or for development etc...
-    for section in ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']:
-        deps = package_json.get(section, {})
-        all_deps.update(deps)
-    return all_deps
 
 # by looking at a package and its version string, we compare it to the dict of known vulnerable packages
 # allowed_range contains all the different versions of that package that we accept 
@@ -104,13 +87,9 @@ def create_issue(repo, vulnerable_deps):
 # main loop
 for repo in repos:
     print(f"Checking {repo.full_name}...")
-    package_json = get_package_json(repo)
-    if not package_json:
-        # there is no package.json file
-        continue
 
     # all dependencies in the repo
-    deps = extract_dependencies(package_json)
+    deps = dependencies.scan(repo)
 
     # this will contain all the vulnerable dependencies used in that repo
     vulnerable_deps = {}
