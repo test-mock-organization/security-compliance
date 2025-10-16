@@ -12,13 +12,13 @@ We’ve been informed about a vulnerability affecting several packages. These pa
 ## What you need to do
 
 - Do not update or change dependencies unless you receive specific guidance.
-- If you maintain a repository with a `package.json` file, please keep an eye out for direct communication from the Platform team in the Issues section of your repo.
+- If you maintain a repository with a `package.json` or `requirements.txt`, etc... file, please keep an eye out for direct communication from the Platform team in the Issues section of your repo.
 - Stay informed by checking impacted packages on https://www.aikido.dev/blog/s1ngularity-nx-attackers-strike-again or the `vulnerable_packages.json` (can be found in this repo in `/data`) and any updates we provide through official channels.
 
 ## Stay secure :)
 
 This is a great reminder to:
-- Regularly checck your dependencies
+- Regularly check your dependencies
 - Review PRs for dependency changes carefully
 
 Thank you for your attention and support in keeping our codebase secure.  
