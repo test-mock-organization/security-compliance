@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 from datetime import datetime, timezone
 from github import Github, Auth
 
@@ -40,10 +39,19 @@ org = g.get_organization(ORG_NAME)
 exclude_names = {"security-compliance"}
 repos = [repo for repo in org.get_repos() if repo.name not in exclude_names]
 
-# by looking at a package and its version string, we compare it to the dict of known vulnerable packages
-# allowed_range contains all the different versions of that package that we accept 
-# (i.e. if the vulnerable version is contained in that range, we are in trouble) 
+# function to check whether a package and range is vulnerable
 def is_version_vulnerable(pkg, allowed_range):
+    """
+    By looking at a package and its version string (using ^, ~, >, <, =), we compare it to the dict of known vulnerable packages
+    (if the vulnerable version is contained in the allowed range, we are in trouble)
+    
+    Parameters:
+        pkg (string): package name
+        allowed_range (string): version string, contains all the different versions of that package that is allowed by the project 
+    
+    Returns:
+        (boolean): is it vulnerable
+    """
     if pkg not in VULNERABLE_PACKAGES:
         # package clean
         return False
@@ -65,6 +73,13 @@ def is_version_vulnerable(pkg, allowed_range):
 
 # function to raise the GH issue in a given repo with its vulnerable dependencies
 def create_issue(repo, vulnerable_deps):
+    """
+    Create a Github Issue with vulnerable dependencies in the body
+    
+    Parameters:
+        repo (github.Repository.Repository): Github repository
+        vulnerable_deps (dict): dependencies that we want to inform the users about
+    """    
     # find all open issues with the same title
     existing_issues = []
     for issue in repo.get_issues(state='open'):
